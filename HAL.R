@@ -125,19 +125,9 @@ for_py <- function(hal_fit, df){
 }
 
 
-#a fcn that writes the necessary files to csv
-write_files <- function(fit_df, df, name1, name2){
-  
-  #get that boiiii ova to python
-  write.csv(x = fit_df, file = paste('./', name1,'.csv', sep=''))
-  
-  #also write the feature set to csv for python
-  write.csv(x = df[,-1], file = paste('./', name2,'.csv', sep=''))
-}
-
 ### import data, fit hal, get cvr2, create objects for py, write to csv ###
 
-evaluate_hal <- function(df, df_name, num_fits){
+write_hal_files <- function(df, df_name, num_fits){
   
   r2_vec <- vector(length = num_fits)
   
@@ -153,30 +143,18 @@ evaluate_hal <- function(df, df_name, num_fits){
     r2_vec[i] <- r2
     
     fit_df <- for_py(hal_fit, df)
-    write_files(fit_df, df, paste0(df_name, '_fit_', i), paste0(df_name, '_features'))
+    write.csv(x = fit_df, 
+              file = paste('./', paste0(df_name, '_fit_', i),'.csv', sep=''))
     
   }
   
-  return(r2_vec)
+  write.csv(x = r2_vec, file = paste0('./', df_name, '_r2s.csv'))
+  return()
 } 
 
-#cpu
-cpu <- read.csv(paste0(path,"cpu.csv"))
-cpu_r2_vec <- evaluate_hal(cpu, "cpu")
-cpu_hal_r2_mean <- mean(cpu_r2_vec)
-cpu_hal_r2_sd <- sd(cpu_r2_vec)
 
-#mussels
-mussels <- read.csv(paste0(path,"mussels.csv"))
-mussels_r2_vec <- evaluate_hal(mussels, "mussels")
-mussels_hal_r2_mean <- mean(mussels_r2_vec)
-mussels_hal_r2_sd <- sd(mussels_r2_vec)
-
-#fev
-fev <- read.csv(paste0(path,"fev.csv"))
-fev_r2_vec <- evaluate_hal(fev, "fev")
-fev_hal_r2_mean <- mean(fev_r2_vec)
-fev_hal_r2_sd <- sd(fev_r2_vec)
-
+df <- read.csv(paste0('./',df_name,'.csv'))
+write.csv(x = df[,-1], file = paste('./', df_name,'_features.csv', sep=''))
+write_hal_files(df = df, df_name = df_name, num_fits = num_fits)
 
 

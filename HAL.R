@@ -47,7 +47,7 @@ for_py <- function(hal_fit, df){
 
 
 ### import data, fit hal, get cvr2, create objects for py, write all to csv ###
-write_hal_files <- function(df, df_name, seed_vec, verbose ){
+write_hal_files <- function(df, df_name, seed_vec, verbose){
   
   '
   This function takes in a dataframe, the name of the dataframe as a string,

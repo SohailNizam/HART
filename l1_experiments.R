@@ -1,30 +1,33 @@
-##########################################
-## A script to laod data, fit HAL,      ##
-## and prepare needed files for HART.Py ##
-##########################################
-
+###########################################
+## A script to loadd data, fit HAL,       ##
+## and prepare needed files for HART.Py  ##
+## for each penalization term in the fit ##
+###########################################
 
 #load packages
 library(hal9001)
 library(data.table)
 library(nnls)
-library(SuperLearner)
-library(randomForest)
-library(rpart)
 library(glmnet)
-library(ggplot2)
-library(dplyr)
 library(reshape2)
 
-#the same as above, but uses the hal fits for every l1 penalty tried
-for_py_lambda <- function(hal_fit, df, deg, i){
+#a function to create files needed for HART in python
+#for every l1 penalty term in a hal fit
+for_py_l1 <- function(hal_fit, df, i){
   
-  #hal_fit = existing hal_fit object
-  #df = dataframe used to fit hal
-  #deg = max degree hal was fit with
-  #l_vec = vector of lambdas used as input to hal
-  #i = index of the lambda youre interested in in l_vec
+  '
+  This function takes a hal fit object, the dataframe it was built with,
+  and an index corresponding to the desired l1 penalty. HAL automatically tries
+  100 l1 penalty terms, so i can range from 1 to 100.
+
+
+  Nothing is returned. The dataframe containing the information of the specified
+  hal fit that can be used to build a HART in python is written to csv. The file
+  format is df_name_l1_i.csv
+  '
   
+  #set the degree for hal
+  deg = ncol(df) - 1
   
   #get the basis mat
   basis_mat <- Reduce(rbind, hal_fit$basis_list)[as.numeric(names(hal_fit$copy_map)),]
@@ -35,13 +38,10 @@ for_py_lambda <- function(hal_fit, df, deg, i){
   #make fit matrix
   fit_mat <- cbind(basis_mat, hal_fit$glmnet_lasso$beta[,i])
   
-  print("made fit_mat")
   
   #cast to data frame
   fit_df <- data.frame(fit_mat)
-  
-  print("made fit_df")
-  
+
   
   #fcn to add a column with original variable names
   get_names <- function(row){
@@ -51,33 +51,51 @@ for_py_lambda <- function(hal_fit, df, deg, i){
   #add var names as column
   fit_df$var_name <- apply(fit_df, MARGIN = 1, FUN = get_names)
   
-  # print("added names col")
-  
   #cast to character
   fit_df <- data.frame(apply(X = fit_df, MARGIN = 2, FUN = as.character))
   
-  # print("got it to chr")
   #rename the last col to "coeffs"
-  # names(fit_df)[3] <- "coeffs"
+  #names(fit_df)[3] <- "coeffs"
   
-  print("changed the names")
   #get the name of the dataframe as a string
   df_name <- deparse(substitute(df))
   
-  
   #get the names of the output files
-  outfile1 = paste0(path, df_name, "_l", i,".csv")
-  #outfile2 = paste("/Users/sohailnizam/Desktop/", df_name, "_features.csv", sep = "")
+  outfile = paste0('./', df_name, "_l1", i,".csv")
+
+  #write the final df to csv
+  write.csv(x = fit_df, file = outfile)
   
-  print("got the file name")
-  print(paste0(path, df_name, "_l", i,".csv"))
+  return()
   
-  
-  #get that boiiii ova to python
-  write.csv(x = fit_df, file = outfile1)
-  
-  #also write the feature set to csv for python
-  #write.csv(x = df[,-1], file = outfile2)
-  print(paste("lambda =", hal_fit$glmnet_lasso$lambda[i]))
-  print("done")
 }
+
+#fit hal and write the files for each l1 penalty term
+write_hal_files_all_l1 <- function(df){
+  
+  
+  #fit hal
+  hal_fit <- fit_hal(Y = df[,1], X = df[,-1],
+                     fit_type = "glmnet",
+                     n_folds = 5,  
+                     yolo = FALSE, 
+                     max_degree = ncol(df) - 1)
+  
+  
+  #write the cv-r2 values to csv
+  #TODO
+  
+  #call the for_py_l1 function 100 times 
+  for(i in 1:100){
+    for_py_l1(hal_fit, df = df, i)
+  }
+  
+  
+}
+
+#fit hal
+set.seed(seed) #seed <- 123 in paper
+
+#call the function to get all the files written to csv
+
+

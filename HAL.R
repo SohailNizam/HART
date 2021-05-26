@@ -5,15 +5,10 @@
 
 #load packages
 library(hal9001)
-library(data.table)
-library(nnls)
-library(SuperLearner)
-library(randomForest)
-library(rpart)
-library(glmnet)
-library(ggplot2)
-library(dplyr)
-library(reshape2)
+library(data.table) #?
+library(nnls) #?
+library(glmnet) #?
+library(reshape2) #?
 
 
 #a function to create files needed for HART in python

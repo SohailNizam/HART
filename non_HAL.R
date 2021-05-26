@@ -5,15 +5,13 @@
 
 #load packages
 library(hal9001)
-library(data.table)
-library(nnls)
+library(data.table) #?
+library(nnls) #?
 library(SuperLearner)
 library(randomForest)
 library(rpart)
-library(glmnet)
-library(ggplot2)
-library(dplyr)
-library(reshape2)
+library(glmnet) #?
+library(reshape2) #?
 #libraries for any learners beyond randomForest and rpart must be loaded
 #if you wish to evaluate them. They must also be available in 
 #the SuperLearner package

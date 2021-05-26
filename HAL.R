@@ -1,19 +1,23 @@
+##########################################
+## A script to laod data, fit HAL,      ##
+## and prepare needed files for HART.Py ##
+##########################################
+
+
 #install/load hal
 install.packages("hal9001")
 install.packages("data.table")
-#install.packages("L0Learn")
-#install.packages("caret")
 install.packages("nnls")
 install.packages("SuperLearner")
 install.packages("randomForest")
-install.packages("rpart.plot")
+install.packages("rpart")
+install.packages("glmnet")
+install.packages("ggplot2")
+install.packages("dplyr")
 library(data.table)
 library(hal9001)
-#library(rpart)
-library(rpart.plot)
+library(rpart)
 library(glmnet)
-#library(L0Learn)
-#library(caret)
 library(ggplot2)
 library(dplyr)
 library(reshape2)
@@ -21,7 +25,6 @@ library(SuperLearner)
 library(randomForest)
 
 
-path = '/Users/sohailnizam/Documents/HAL_9001/HAL_data/'
 
 #a function to create files needed for HART in python
 for_py <- function(hal_fit, df){
@@ -54,8 +57,9 @@ for_py <- function(hal_fit, df){
 }
 
 
-#the same as above, but uses the hal fits for every lambda parameter tried
-for_py_lambda <- function(hal_fit, df, deg, i){
+#the same as above, but uses the hal fits for every l1 penalty tried
+#MOVE TO NEW SCRIPT
+#for_py_lambda <- function(hal_fit, df, deg, i){
   
   #hal_fit = existing hal_fit object
   #df = dataframe used to fit hal
@@ -125,24 +129,23 @@ for_py_lambda <- function(hal_fit, df, deg, i){
 write_files <- function(fit_df, df, name1, name2){
   
   #get that boiiii ova to python
-  write.csv(x = fit_df, file = paste(path, name1,'.csv', sep=''))
+  write.csv(x = fit_df, file = paste('./', name1,'.csv', sep=''))
   
   #also write the feature set to csv for python
-  write.csv(x = df[,-1], file = paste(path, name2,'.csv', sep=''))
+  write.csv(x = df[,-1], file = paste('./', name2,'.csv', sep=''))
 }
 
 ### import data, fit hal, get cvr2, create objects for py, write to csv ###
 
-evaluate_hal <- function(df, df_name){
+evaluate_hal <- function(df, df_name, num_fits){
   
-  r2_vec <- vector(length = 100)
+  r2_vec <- vector(length = num_fits)
   
-  for(i in 1:100){
+  for(i in 1:num_fits){
     set.seed(i)
     hal_fit <- fit_hal(Y = df[,1], X = df[,-1],
                            fit_type = "glmnet",
                            n_folds = 5,  
-                           #standardize = FALSE, 
                            yolo = FALSE, 
                            max_degree = ncol(df) - 1) 
     
@@ -151,8 +154,6 @@ evaluate_hal <- function(df, df_name){
     
     fit_df <- for_py(hal_fit, df)
     write_files(fit_df, df, paste0(df_name, '_fit_', i), paste0(df_name, '_features'))
-    
-    print(i)
     
   }
   
@@ -176,114 +177,6 @@ fev <- read.csv(paste0(path,"fev.csv"))
 fev_r2_vec <- evaluate_hal(fev, "fev")
 fev_hal_r2_mean <- mean(fev_r2_vec)
 fev_hal_r2_sd <- sd(fev_r2_vec)
-
-
-#cpu
-cpu <- read.csv(paste0(path,"cpu.csv"))
-set.seed(123)
-hal_fit_cpu <- fit_hal(Y = cpu[,1], X = cpu[,-1],
-                       fit_type = "glmnet",
-                       n_folds = 5,  
-                       #standardize = FALSE, 
-                       yolo = FALSE, 
-                       max_degree = 6)
-cpu_r2 <- 1 - (min(hal_fit_cpu$hal_lasso$cvm)/var(cpu$prp)) #.90
-cpu_fit <- for_py(hal_fit_cpu, cpu) #59 nonzero coeffs
-write_files(cpu_fit, cpu, 'cpu_fit', 'cpu_features')
-for(i in 1:100){
-  for_py_lambda(hal_fit_cpu, df = cpu, deg = 6, i)
-}
-cpu_r2_vec <- 1 - (hal_fit_cpu$hal_lasso$cvm[1:85] / var(cpu$prp))
-
-
-#mussels
-mussels<- read.csv(paste0(path, "mussels.csv"))
-set.seed(123)
-hal_fit_mussels <- fit_hal(Y = mussels[,1], X = mussels[,-1],
-                           fit_type = "glmnet",
-                           n_folds = 5,  
-                           #standardize = FALSE, 
-                           yolo = FALSE, 
-                           max_degree = 4)
-mussels_r2 <- 1 - (min(hal_fit_mussels$hal_lasso$cvm)/var(mussels$M)) #.79
-mussels_fit <- for_py(hal_fit_mussels, mussels) #35 nonzero coeffs
-write_files(mussels_fit, mussels, 'mussels_fit', 'mussels_features')
-for(i in 1:100){
-  for_py_lambda(hal_fit_mussels, df = cpu, deg = 4, i)
-}
-mussels_r2_vec <- 1 - (hal_fit_mussels$hal_lasso$cvm[1:85] / var(mussels$M))
-
-
-#fev
-fev <- read.csv(paste0(path, "fev.csv"))
-set.seed(123)
-hal_fit_fev <- fit_hal(Y = fev[,1], X = fev[,-1],
-                       fit_type = "glmnet",
-                       n_folds = 5,  
-                       #standardize = FALSE, 
-                       yolo = FALSE, 
-                       max_degree = 4)
-fev_r2 <- 1 - (min(hal_fit_fev$hal_lasso$cvm)/var(fev$fev)) #.79
-fev_fit <- for_py(hal_fit_fev, fev) #51 nonzero coeffs
-write_files(fev_fit, fev, 'fev_fit', 'fev_features')
-for(i in 1:100){
-  for_py_lambda(hal_fit_fev, df = cpu, deg = 4, i)
-}
-fev_r2_vec <- 1 - (hal_fit_fev$hal_lasso$cvm[1:85] / var(fev$fev))
-
-## Create r2 vs node count figure ##
-
-#import the node counts
-node_counts <- read.csv(paste0(path,"node_counts.csv"))
-#create df containing node counts and r2 values
-node_counts$cpu_r2 <- cpu_r2_vec
-node_counts$mussels_r2 <- mussels_r2_vec
-node_counts$fev_r2 <- fev_r2_vec
-View(node_counts)
-
-#create the figures
-font_size <- 15
-line_size <- .75
-
-node_counts %>%
-  ggplot(aes(cpu,cpu_r2)) + 
-  geom_line() + 
-  labs(title = "CPU", x = "Node Count", y = expression(paste("CV-", R^2))) +
-  coord_cartesian(xlim = c(0, 45000), ylim = c(0, .9)) + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = font_size),
-        text = element_text(size = font_size),
-        axis.text = element_text(size = font_size)) + 
-  geom_hline(yintercept = .84, linetype = "dotted", color = "blue", size = line_size) + 
-  geom_hline(yintercept = .58, linetype = "dashed", color = "green", size = line_size) + 
-  geom_hline(yintercept = .87, linetype = "solid", color = "red", size = line_size)
-
-node_counts %>%
-  ggplot(aes(mussels,mussels_r2)) + 
-  geom_line() + 
-  labs(title = "Mussels", x = "Node Count", y = expression(paste("CV-", R^2))) +
-  coord_cartesian(xlim = c(0, 7500), ylim = c(0, .85)) + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = font_size),
-        text = element_text(size = font_size),
-        axis.text = element_text(size = font_size)) + 
-  geom_hline(yintercept = .84, linetype = "dotted", color = "blue", size = line_size) + 
-  geom_hline(yintercept = .75, linetype = "dashed", color = "green", size = line_size) + 
-  geom_hline(yintercept = .80, linetype = "solid", color = "red", size = line_size)
-
-node_counts %>%
-  ggplot(aes(fev,fev_r2)) + 
-  geom_line() + 
-  labs(title = "FEV", x = "Node Count", y = expression(paste("CV-", R^2))) +
-  coord_cartesian(xlim = c(0, 750), ylim = c(0, .80)) + 
-  theme_bw() + 
-  theme(plot.title = element_text(size = font_size),
-        text = element_text(size = font_size),
-        axis.text = element_text(size = font_size)) + 
-  geom_hline(yintercept = .71, linetype = "dotted", color = "blue", size = line_size) + 
-  geom_hline(yintercept = .73, linetype = "dashed", color = "green", size = line_size) + 
-  geom_hline(yintercept = .78, linetype = "solid", color = "red", size = line_size)
-
 
 
 

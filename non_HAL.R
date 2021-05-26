@@ -3,70 +3,88 @@
 ## other algorithms (e.g. CART and RF)  ##
 ##########################################
 
-### Get CART and RF results for each dataset ###
+#load packages
+library(hal9001)
+library(data.table)
+library(nnls)
+library(SuperLearner)
+library(randomForest)
+library(rpart)
+library(glmnet)
+library(ggplot2)
+library(dplyr)
+library(reshape2)
+#libraries for any learners beyond randomForest and rpart must be loaded
+#if you wish to evaluate them. They must also be available in 
+#the SuperLearner package
 
-evaluate_algo <- function(algo_name, df){
+
+#a function to evaluate a chosen algorithm
+#in the paper, we use randomForest and rpart
+evaluate_algo <- function(algo_name, df, seed_vec, verbose){
   
-  r2_vec <- vector(length=100)
-  node_count_vec <- vector(length = 100)
+  '
+  This function takes in the name of an algorithm, a dataframe to be analyzed,
+  a vector of random seeds to be used, and a boolean (TRUE if you want printed updates).
+  The algorithm will be fit and evaluated with each seed specified. The default vector is 1:100.
+
+  If using rpart, the output is a two column dataframe. First column contains cv-r2 values 
+  for each seed, and second columns contains terminal node counts for each seed. If using anything
+  else (e.g. randomForest), the output is a vector containing cv-r2 values for each seed.
+
+  *If you wish to use any algorithms besides rpart and randomForest, they must be available in
+   the SuperLearner library, and the appropriate packages must be loaded.
+  '
   
-  for(i in 1:100){
+  #initialize vector to hold cv-r2 values 
+  r2_vec <- vector(length = length(seed_vec))
+  #initialize terminal node count vector in case using rpart
+  node_count_vec <- vector(length = length(seed_vec))
+  
+  #for each seed
+  for(i in seed_vec){
     set.seed(i)
+    
+    #build the specified model using the SuperLearner packaage
     model <- SuperLearner(Y = df[,1], X = df[,-1],
                           SL.library = paste0("SL.", algo_name), 
                           family = gaussian(), cvControl = list(V=5))
     
+    #get the cv-R2 value
     r2 <- 1 - (model$cvRisk / var(df[,1]))
+    #add value to the running vector
     r2_vec[i] <- r2
     
+    #if using rpart, add the terminal node count to the running vector
     if(algo_name == "rpart"){
       
       tn_count <- length(table(model$fitLibrary$SL.rpart_All$object$where))
       node_count_vec[i] <- tn_count
     }
     
-    print(i)
+    #if you'd like printed progress updates
+    if(verbose){print(paste0(i," model(s) successfully built."))}
     
   }
   
-  if(length(node_count_vec) == length(r2_vec)){
-    return(data.frame(node_count_vec, r2_vec))
+  #if using rpart, write both r2 and nod_count vectors in a df
+  if(algo_name == "rpart"){
+    #write the results to csv
+    write.csv(x = data.frame(node_count_vec, r2_vec), 
+              file = paste0('./', df_name, '_', algo_name, '_r2s.csv'))
   }
-  else{return(r2_vec)}
+  #if using anything else, write just the r2 vector
+  else{#write the results to csv
+    write.csv(x = r2_vec, 
+              file = paste0('./', df_name, '_', algo_name, '_r2s.csv'))}
+  
+  return()
   
 }
 
-#cpu
-cpu_rf_r2_vec <- evaluate_algo("randomForest", cpu)
-cpu_rf_mean <- mean(cpu_rf_r2_vec) #.84
-cpu_rf_sd <- sd(cpu_rf_r2_vec) #.05
+#import the data
+df <- read.csv(paste0('./', df_name, '.csv'))
+#evaluate the algorithm and write the results to csv
+rslts <- evaluate_algo(algo_name, df, seed_vec = seed_vec, verbose = verbose)
 
-cpu_rpart_rslts <- evaluate_algo("rpart", cpu)
-cpu_rpart_r2_mean <- mean(cpu_rpart_rslts$r2_vec) #.58
-cpu_rpart_r2_sd <-  sd(cpu_rpart_rslts$r2_vec) #.06
-cpu_rpart_nc_mean <- mean(cpu_rpart_rslts$node_count_vec) #5
-cpu_rpart_nc_sd <- sd(cpu_rpart_rslts$node_count_vec) #0
-
-#mussels
-mussels_rf_r2_vec <- evaluate_algo("randomForest", mussels)
-mussels_rf_mean <- mean(mussels_rf_r2_vec) #.84
-mussels_rf_sd <- sd(mussels_rf_r2_vec) #.01
-
-mussels_rpart_rslts <- evaluate_algo("rpart", mussels)
-mussels_rpart_r2_mean <- mean(mussels_rpart_rslts$r2_vec) #.75
-mussels_rpart_r2_sd <- sd(mussels_rpart_rslts$r2_vec) #.03
-mussels_rpart_nc_mean <- mean(mussels_rpart_rslts$node_count_vec) #5
-mussels_rpart_nc_sd <- sd(mussels_rpart_rslts$node_count_vec) #0
-
-
-#fev
-fev_rf_r2_vec <- evaluate_algo("randomForest", fev)
-fev_rf_mean <- mean(fev_rf_r2_vec) #.71
-fev_rf_sd <- sd(fev_rf_r2_vec) #.004
-
-fev_rpart_rslts <- evaluate_algo("rpart", fev)
-fev_rpart_r2_mean <- mean(fev_rpart_rslts$r2_vec) #.73
-fev_rpart_r2_sd <-  sd(fev_rpart_rslts$r2_vec) #.01
-fev_rpart_nc_mean <- mean(fev_rpart_rslts$node_count_vec) #7
-fev_rpart_nc_sd <- sd(fev_rpart_rslts$node_count_vec) #0
 

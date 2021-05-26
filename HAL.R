@@ -52,7 +52,7 @@ for_py <- function(hal_fit, df){
 
 
 ### import data, fit hal, get cvr2, create objects for py, write all to csv ###
-write_hal_files <- function(df, df_name, seed_vec = 1:100, verbose = FALSE){
+write_hal_files <- function(df, df_name, seed_vec, verbose ){
   
   '
   This function takes in a dataframe, the name of the dataframe as a string,
@@ -63,7 +63,8 @@ write_hal_files <- function(df, df_name, seed_vec = 1:100, verbose = FALSE){
                                              remaining columns are features/preduictors
 
   There is no output. Files are written to the current directory. Those files are:
-  1. csv file containing CV-R2 values for each HAL fit
+  1. csv file containing CV-R2 values for each HAL fit. If df_name = df_name 
+  The file format will be df_name_hal_r2s.csv.
   2. csv files containing data ready for building HARTs in Python 
   (one file for each seed). If seed = s and df_name = df_name, 
   the file format will be df_name_fit_s.csv
@@ -93,7 +94,7 @@ write_hal_files <- function(df, df_name, seed_vec = 1:100, verbose = FALSE){
     fit_df <- for_py(hal_fit, df)
     #write the file to csv
     write.csv(x = fit_df, 
-              file = paste('./', paste0(df_name, '_fit_', i),'.csv', sep=''))
+              file = paste('./', paste0(df_name, '_hal_', i),'.csv', sep=''))
     
     #if you want progress prints
     if(verbose){print(paste0(i, " hal fit(s) done."))}
@@ -101,7 +102,7 @@ write_hal_files <- function(df, df_name, seed_vec = 1:100, verbose = FALSE){
   }
   
   #write the r2 vector to csv
-  write.csv(x = r2_vec, file = paste0('./', df_name, '_r2s.csv'))
+  write.csv(x = r2_vec, file = paste0('./', df_name, '_hal_r2s.csv'))
   return()
 } 
 
@@ -111,6 +112,6 @@ df <- read.csv(paste0('./',df_name,'.csv'))
 #write just the features to a separate csv file
 write.csv(x = df[,-1], file = paste('./', df_name,'_features.csv', sep=''))
 #write the csv needed to build HARTs in Python
-write_hal_files(df = df, df_name = df_name, seed_vec = seed_vec)
+write_hal_files(df = df, df_name = df_name, seed_vec = seed_vec, verbose = verbose)
 
 

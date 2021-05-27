@@ -1,6 +1,8 @@
 ##########################################
 ## A script to laod data, evaluate,     ##
 ## other algorithms (e.g. CART and RF)  ##
+##                                      ##
+## REQUIRES: Assignment of df_name      ##
 ##########################################
 
 #load packages

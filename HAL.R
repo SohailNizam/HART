@@ -1,6 +1,8 @@
 ##########################################
 ## A script to laod data, fit HAL,      ##
 ## and prepare needed files for HART.Py ##
+##                                      ##
+## REQUIRES: Assignment of df_name      ##
 ##########################################
 
 #load packages

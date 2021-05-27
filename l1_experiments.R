@@ -1,7 +1,9 @@
 ###########################################
-## A script to loadd data, fit HAL,       ##
+## A script to loadd data, fit HAL,      ##
 ## and prepare needed files for HART.Py  ##
 ## for each penalization term in the fit ##
+##                                       ##
+## REQUIRES: Assignment of df_name       ##
 ###########################################
 
 #load packages

@@ -5,10 +5,10 @@
 
 #load packages
 library(hal9001)
-library(data.table) #?
-library(nnls) #?
-library(glmnet) #?
-library(reshape2) #?
+#library(data.table) #?
+#library(nnls) #?
+#library(glmnet) #?
+#library(reshape2) #?
 
 
 #a function to create files needed for HART in python
@@ -96,11 +96,16 @@ write_hal_files <- function(df, df_name, seed_vec){
 
   }
   
+  r2_vec <- data.frame(r2_vec)
+  names(r2_vec) <- c('r2')
   #write the r2 vector to csv
   write.csv(x = r2_vec, file = paste0('./', df_name, '_hal_r2s.csv'))
   return()
 } 
 
+
+df_name <- 'fev'
+seed_vec <- 1:3
 
 #import the data
 df <- read.csv(paste0('./',df_name,'.csv'))

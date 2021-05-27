@@ -9,13 +9,12 @@ a new csv file containing information about the trees.
 
 #import necessary libraries
 from anytree import AnyNode, Node, RenderTree
-from anytree.exporter import DotExporter
-from graphviz import Digraph
+#from anytree.exporter import DotExporter
 import random
 import copy
 import pandas as pd
 import numpy as np
-import re #?
+
 
 
 
@@ -630,6 +629,12 @@ def build_n_count(data_name, l1, num_fits):
     return(node_count_df)
 
 
+
+if l1:
+    file_type = '_l1_'
+else:
+    file_type= '_hal_'
+
 #call the build_n_count function
 node_counts = build_n_count(data_name = data_name, 
                             l1 = l1, num_fits = num_fits)
@@ -638,10 +643,10 @@ node_counts = build_n_count(data_name = data_name,
 r2_data = pd.read_csv('./' + data_name + file_type + 'r2s.csv')
 
 #combine r2 data with node count data into one df
-node_counts['r2'] = r2_data
+node_counts['r2'] = r2_data['r2']
 
 #write the new complete df to csv
-node_counts.to_csv('./' + data_name + file_type + 'eval.csv')
+node_counts.to_csv('./' + data_name + file_type + 'eval.csv',  index = False)
 
 
 

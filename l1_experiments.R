@@ -86,7 +86,7 @@ write_hal_files_all_l1 <- function(df, seed){
   
   #write the cv-r2 values to csv
   r2_vec <- 1 - (hal_fit$hal_lasso$cvm[1:85] / var(df[,1]))
-  write.csv(x = r2_vec, file =paste0('./', df_name, '_hal_l1_r2s.csv'))
+  write.csv(x = r2_vec, file =paste0('./', df_name, '_l1_r2s.csv'))
   
   #call the for_py_l1 function 85 times 
   for(i in 1:85){

@@ -431,7 +431,13 @@ def grow_tree(hal_fit, hal_dict, hal_fit2, value_dict, total_beta = 0, gt = [], 
     Input: hal_fit object (list of lists to be shrunk with each recursive call)
            hal_fit2 (exact copy of hal fit kept the same in each iter)
            hal_dict (dictionary linking split names to beta values)
-           gt (list containing labels of all values we're currently "greater than")
+           value_dict (dictionary linking data values to the terms in the basis
+                       expansion causing them to be relevant in the given 
+                       tree region)
+           total_beta (running prediction total)
+           gt (list containing labels of all values we're currently 
+               "greater than")
+           k (int, the degree of interaction term used to fit hal)
            
     Output: an anytree node object with children
     '''
@@ -558,6 +564,20 @@ def grow_tree(hal_fit, hal_dict, hal_fit2, value_dict, total_beta = 0, gt = [], 
 
 def build_n_count(data_name, l1, num_fits):
     
+    
+    '''
+    This function builds trees from hal fit information generated in R
+    and counts their terminal nodes and unique terminal nodes.
+    
+    Input: data_name (str, the name of the dataset used to fit hal)
+           l1 (boolean, True if building trees for l1 penalty term experiments)
+           num_fits (int, the number of hal fit files to build trees for)
+           
+    Output: node_count_df (pandas df, contains columsn with terminal node
+                           counts and unique terminal node counts)
+    
+    '''
+    
     tn_counts = []
     utn_counts = []
     features = pd.read_csv('./' + data_name + "_features.csv")
@@ -610,108 +630,18 @@ def build_n_count(data_name, l1, num_fits):
     return(node_count_df)
 
 
+#call the build_n_count function
+node_counts = build_n_count(data_name = data_name, 
+                            l1 = l1, num_fits = num_fits)
 
+#read in the corresponding r2 data
+r2_data = pd.read_csv('./' + data_name + file_type + 'r2s.csv')
 
+#combine r2 data with node count data into one df
+node_counts['r2'] = r2_data
 
-########## CPU ##############
-
-
-cpu_node_counts = build_n_count('cpu', 10)
-
-
-cpu_hal_mean_tn_count = np.mean(cpu_node_counts["tn_counts"]) #718798.9
-cpu_hal_sd_tn_count = np.std(cpu_node_counts["tn_counts"]) #700521.774460359
-
-cpu_hal_mean_utn_count = np.mean(cpu_node_counts["utn_counts"]) #328876.8
-cpu_hal_sd_utn_count = np.std(cpu_node_counts["utn_counts"]) #343929.3129280492
-
-
-########## Mussels ##############
-
-mussels_node_counts = build_n_count('mussels', 100)
-
-mussels_hal_mean_tn_count = np.mean(mussels_node_counts["tn_counts"]) #4900.26
-mussels_hal_sd_tn_count = np.std(mussels_node_counts["tn_counts"]) #2171.75
-
-mussels_hal_mean_utn_count = np.mean(mussels_node_counts["utn_counts"]) #3254.57
-mussels_hal_sd_utn_count = np.std(mussels_node_counts["utn_counts"]) #1450.26
-
-
-########## FEV ##############
-
-fev_node_counts = build_n_count('fev', 100)
-
-fev_hal_mean_tn_count = np.mean(fev_node_counts["tn_counts"]) #669.22
-fev_hal_sd_tn_count = np.std(fev_node_counts["tn_counts"]) #226.11
-
-fev_hal_mean_utn_count = np.mean(fev_node_counts["utn_counts"]) #245.38
-fev_hal_sd_utn_count = np.std(fev_node_counts["utn_counts"]) #65.36
-
-
-
-
-################################
-### Penalty Term Experiments ###
-################################
-
-
-#####Import the hal data and feature set####
-    
-path = '/Users/sohailnizam/Documents/HAL_9001/HAL_data/'
-
-#read in files for the lambda experiment
-g = globals()
-for i in range(1,101):
-    g['cpu_l{}'.format(i)] = pd.read_csv(path + "cpu_l{}.csv".format(i))
-    g['mussels_l{}'.format(i)] = pd.read_csv(path + "mussels_l{}.csv".format(i))
-    g['fev_l{}'.format(i)] = pd.read_csv(path + "fev_l{}.csv".format(i))
-    
-    
-def build_n_count(hal_info, features):
-    
-    #assume max number of int terms
-    k = features.shape[1] - 1
-    
-    hal_dict = create_dict(hal_info)
-    hal_fit2 = create_fit(features)
-    value_dict = create_value_dict(hal_fit2, hal_dict)
-    hal_fit = clean_hal(hal_fit2, value_dict)
-    hal_fit = sort_hal(hal_fit, value_dict)
-    
-    
-    
-    tree = grow_tree(hal_fit, hal_dict, hal_fit2, value_dict, k = k)
-    
-    return(len(tree.leaves))
-
-
-
-def lambda_tree_count(data, features):
-    g = globals()
-    count_list = []
-    for i in range(1, 86):
-        count = build_n_count(g['{}_l{}'.format(data, i)], features)
-        count_list.append(count)
-        print('{}'.format(i) + " done.")
-    
-    return(count_list)
-
-
-
-
-# CPU
-cpu_node_counts = lambda_tree_count('cpu', cpu_features)
-cpu_node_counts.to_csv(path + "cpu_node_counts.csv")
-    
-# Mussels
-mussels_node_counts = lambda_tree_count('mussels', mussels_features)
-mussels_node_counts.to_csv(path + "mussels_node_counts.csv")
-
-# FEV
-fev_node_counts = lambda_tree_count('fev', fev_features)
-fev_node_counts.to_csv(path + "fev_node_counts.csv")
-
-
+#write the new complete df to csv
+node_counts.to_csv('./' + data_name + file_type + 'eval.csv')
 
 
 

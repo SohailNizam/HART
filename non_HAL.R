@@ -5,13 +5,14 @@
 
 #load packages
 library(hal9001)
-library(data.table) #?
-library(nnls) #?
+#library(data.table) #?
+library(nnls)
 library(SuperLearner)
 library(randomForest)
 library(rpart)
-library(glmnet) #?
-library(reshape2) #?
+#library(glmnet) #?
+#library(reshape2) #?
+
 #libraries for any learners beyond randomForest and rpart must be loaded
 #if you wish to evaluate them. They must also be available in 
 #the SuperLearner package
@@ -64,18 +65,32 @@ evaluate_algo <- function(algo_name, df, seed_vec){
   
   #if using rpart, write both r2 and nod_count vectors in a df
   if(algo_name == "rpart"){
-    #write the results to csv
-    write.csv(x = data.frame(node_count_vec, r2_vec), 
-              file = paste0('./', df_name, '_', algo_name, '_r2s.csv'))
+    
+    #create df out of node_counts and r2_vec
+    r2 <- data.frame(node_count_vec, r2_vec)
+    names(r2) <- c("tn_counts", "r2")
+  
   }
   #if using anything else, write just the r2 vector
-  else{#write the results to csv
-    write.csv(x = r2_vec, 
-              file = paste0('./', df_name, '_', algo_name, '_r2s.csv'))}
+  else{
+    
+    #create df out of just r2_results
+    r2 <- data.frame(r2_vec)
+    names(r2) <- c("r2")
+    
+   }
   
-  return()
+  
+  #write the results to csv
+  write.csv(x = r2, 
+            file = paste0('./', df_name, '_', algo_name, '_r2s.csv'))
+  return(r2)
   
 }
+
+df_name <- 'fev'
+seed_vec <- 1:3
+algo_name <- 'rpart'
 
 #import the data
 df <- read.csv(paste0('./', df_name, '.csv'))

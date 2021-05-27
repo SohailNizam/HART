@@ -5,11 +5,6 @@
 
 #load packages
 library(hal9001)
-#library(data.table) #?
-#library(nnls) #?
-#library(glmnet) #?
-#library(reshape2) #?
-
 
 #a function to create files needed for HART in python
 for_py <- function(hal_fit, df){

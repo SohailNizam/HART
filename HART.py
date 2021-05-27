@@ -578,7 +578,7 @@ def build_n_count(data_name, l1, num_fits):
     
     tn_counts = []
     utn_counts = []
-    features = pd.read_csv('./' + data_name + "_features.csv")
+    features = pd.read_csv('./data/' + data_name + "_features.csv")
     
     if l1:
         file_type = '_l1_'
@@ -588,7 +588,7 @@ def build_n_count(data_name, l1, num_fits):
     for i in range(1, num_fits + 1):
                 
         #read in data
-        data = pd.read_csv('./' + data_name + file_type + str(i) + '.csv')
+        data = pd.read_csv('./data/' + data_name + file_type + str(i) + '.csv')
         
         #create all objects needed for grow_tree
         hal_dict = create_dict(data)
@@ -639,12 +639,12 @@ node_counts = build_n_count(data_name = data_name,
                             l1 = l1, num_fits = num_fits)
 
 #read in the corresponding r2 data
-r2_data = pd.read_csv('./' + data_name + file_type + 'r2s.csv')
+r2_data = pd.read_csv('./data/' + data_name + file_type + 'r2s.csv')
 
 #combine r2 data with node count data into one df
 node_counts['r2'] = r2_data['r2']
 
-#write the new complete df to csv
+#write the new complete df to csv (to the current working dir)
 node_counts.to_csv('./' + data_name + file_type + 'eval.csv',  index = False)
 
 

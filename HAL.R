@@ -84,7 +84,7 @@ write_hal_files <- function(df, df_name, seed_vec){
     #create python-ready file
     fit_df <- for_py(hal_fit, df)
     #write the file to csv
-    write.csv(x = fit_df, file = paste0('./', df_name, '_hal_', num,'.csv'))
+    write.csv(x = fit_df, file = paste0('./data/', df_name, '_hal_', num,'.csv'))
     
     #increment the fit counter
     num <- num + 1
@@ -94,15 +94,15 @@ write_hal_files <- function(df, df_name, seed_vec){
   r2_vec <- data.frame(r2_vec)
   names(r2_vec) <- c('r2')
   #write the r2 vector to csv
-  write.csv(x = r2_vec, file = paste0('./', df_name, '_hal_r2s.csv'))
+  write.csv(x = r2_vec, file = paste0('./data/', df_name, '_hal_r2s.csv'))
   return()
 } 
 
 
 #import the data
-df <- read.csv(paste0('./',df_name,'.csv'))
+df <- read.csv(paste0('./data/',df_name,'.csv'))
 #write just the features to a separate csv file
-write.csv(x = df[,-1], file = paste('./', df_name,'_features.csv', sep=''))
+write.csv(x = df[,-1], file = paste('./data/', df_name,'_features.csv', sep=''))
 #write the csv needed to build HARTs in Python
 write_hal_files(df = df, df_name = df_name, seed_vec = seed_vec)
 

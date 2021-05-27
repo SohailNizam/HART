@@ -81,13 +81,13 @@ evaluate_algo <- function(algo_name, df, seed_vec){
   
   #write the results to csv
   write.csv(x = r2, 
-            file = paste0('./', df_name, '_', algo_name, '_r2s.csv'))
+            file = paste0('./data/', df_name, '_', algo_name, '_r2s.csv'))
   return(r2)
   
 }
 
 #import the data
-df <- read.csv(paste0('./', df_name, '.csv'))
+df <- read.csv(paste0('./data/', df_name, '.csv'))
 #evaluate the algorithm and write the results to csv
 rslts <- evaluate_algo(algo_name, df, seed_vec = seed_vec)
 

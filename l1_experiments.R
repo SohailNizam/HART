@@ -54,7 +54,7 @@ for_py_l1 <- function(hal_fit, df, df_name, i){
   names(fit_df)[3] <- "coeffs"
   
   #get the names of the output files
-  outfile = paste0('./', df_name, "_l1_", i,".csv")
+  outfile = paste0('./data/', df_name, "_l1_", i,".csv")
 
   #write the final df to csv
   write.csv(x = fit_df, file = outfile)
@@ -81,7 +81,7 @@ write_hal_files_all_l1 <- function(df, df_name, seed){
   r2_vec <- 1 - (hal_fit$hal_lasso$cvm[1:3] / var(df[,1]))
   r2 <- data.frame(r2_vec)
   names(r2) <- c('r2')
-  write.csv(x = r2, file =paste0('./', df_name, '_l1_r2s.csv'))
+  write.csv(x = r2, file =paste0('./data/', df_name, '_l1_r2s.csv'))
   
   #call the for_py_l1 function 85 times 
   for(i in 1:3){
@@ -92,9 +92,9 @@ write_hal_files_all_l1 <- function(df, df_name, seed){
 
 
 #import the data
-df <- read.csv(paste0('./',df_name,'.csv'))
+df <- read.csv(paste0('./data/',df_name,'.csv'))
 #call the function to get all the files written to csv
 write_hal_files_all_l1(df = df, df_name = df_name, seed = seed)
 #also write the feature set as a separate csv file
-write.csv(x = df[,-1], file = paste('./', df_name,'_features.csv', sep=''))
+write.csv(x = df[,-1], file = paste('./data/', df_name,'_features.csv', sep=''))
 

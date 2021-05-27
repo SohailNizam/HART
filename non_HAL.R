@@ -88,10 +88,6 @@ evaluate_algo <- function(algo_name, df, seed_vec){
   
 }
 
-df_name <- 'fev'
-seed_vec <- 1:3
-algo_name <- 'rpart'
-
 #import the data
 df <- read.csv(paste0('./', df_name, '.csv'))
 #evaluate the algorithm and write the results to csv

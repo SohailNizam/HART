@@ -6,14 +6,10 @@
 
 #load packages
 library(hal9001)
-library(data.table) #?
-library(nnls) #?
-library(glmnet) #?
-library(reshape2) #?
 
 #a function to create files needed for HART in python
 #for every l1 penalty term in a hal fit
-for_py_l1 <- function(hal_fit, df, i){
+for_py_l1 <- function(hal_fit, df, df_name, i){
   
   '
   This function takes a hal fit object, the dataframe it was built with,
@@ -27,7 +23,7 @@ for_py_l1 <- function(hal_fit, df, i){
   '
   
   #set the degree for hal
-  deg = ncol(df) - 1
+  deg <- ncol(df) - 1
   
   #get the basis mat
   basis_mat <- Reduce(rbind, hal_fit$basis_list)[as.numeric(names(hal_fit$copy_map)),]
@@ -55,10 +51,7 @@ for_py_l1 <- function(hal_fit, df, i){
   fit_df <- data.frame(apply(X = fit_df, MARGIN = 2, FUN = as.character))
   
   #rename the last col to "coeffs"
-  #names(fit_df)[3] <- "coeffs"
-  
-  #get the name of the dataframe as a string
-  df_name <- deparse(substitute(df))
+  names(fit_df)[3] <- "coeffs"
   
   #get the names of the output files
   outfile = paste0('./', df_name, "_l1_", i,".csv")
@@ -71,7 +64,7 @@ for_py_l1 <- function(hal_fit, df, i){
 }
 
 #fit hal and write the files for each l1 penalty term
-write_hal_files_all_l1 <- function(df, seed){
+write_hal_files_all_l1 <- function(df, df_name, seed){
   
   #set the random seed
   set.seed(seed) #seed <- 123 in paper
@@ -85,18 +78,23 @@ write_hal_files_all_l1 <- function(df, seed){
   
   
   #write the cv-r2 values to csv
-  r2_vec <- 1 - (hal_fit$hal_lasso$cvm[1:85] / var(df[,1]))
-  write.csv(x = r2_vec, file =paste0('./', df_name, '_l1_r2s.csv'))
+  r2_vec <- 1 - (hal_fit$hal_lasso$cvm[1:3] / var(df[,1]))
+  r2 <- data.frame(r2_vec)
+  names(r2) <- c('r2')
+  write.csv(x = r2, file =paste0('./', df_name, '_l1_r2s.csv'))
   
   #call the for_py_l1 function 85 times 
-  for(i in 1:85){
-    for_py_l1(hal_fit = hal_fit, df = df, i)
+  for(i in 1:3){
+    for_py_l1(hal_fit = hal_fit, df = df, df_name = df_name, i)
   }
   
 }
 
+
+#import the data
+df <- read.csv(paste0('./',df_name,'.csv'))
 #call the function to get all the files written to csv
-write_hal_files_all_l1(df = df, seed = seed)
+write_hal_files_all_l1(df = df, df_name = df_name, seed = seed)
 #also write the feature set as a separate csv file
 write.csv(x = df[,-1], file = paste('./', df_name,'_features.csv', sep=''))
 

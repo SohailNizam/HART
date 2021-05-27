@@ -59,7 +59,6 @@ for_py_l1 <- function(hal_fit, df, df_name, i){
   #write the final df to csv
   write.csv(x = fit_df, file = outfile)
   
-  return()
   
 }
 

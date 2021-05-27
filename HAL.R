@@ -95,7 +95,7 @@ write_hal_files <- function(df, df_name, seed_vec){
   names(r2_vec) <- c('r2')
   #write the r2 vector to csv
   write.csv(x = r2_vec, file = paste0('./data/', df_name, '_hal_r2s.csv'))
-  return()
+
 } 
 
 #import the seeds, store in vector

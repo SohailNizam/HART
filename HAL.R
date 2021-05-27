@@ -99,9 +99,6 @@ write_hal_files <- function(df, df_name, seed_vec){
 } 
 
 
-df_name <- 'fev'
-seed_vec <- 1:3
-
 #import the data
 df <- read.csv(paste0('./',df_name,'.csv'))
 #write just the features to a separate csv file

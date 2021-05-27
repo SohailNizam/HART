@@ -19,7 +19,7 @@ library(reshape2) #?
 
 #a function to evaluate a chosen algorithm
 #in the paper, we use randomForest and rpart
-evaluate_algo <- function(algo_name, df, seed_vec, verbose){
+evaluate_algo <- function(algo_name, df, seed_vec){
   
   '
   This function takes in the name of an algorithm, a dataframe to be analyzed,
@@ -60,9 +60,6 @@ evaluate_algo <- function(algo_name, df, seed_vec, verbose){
       node_count_vec[i] <- tn_count
     }
     
-    #if you'd like printed progress updates
-    if(verbose){print(paste0(i," model(s) successfully built."))}
-    
   }
   
   #if using rpart, write both r2 and nod_count vectors in a df
@@ -83,6 +80,6 @@ evaluate_algo <- function(algo_name, df, seed_vec, verbose){
 #import the data
 df <- read.csv(paste0('./', df_name, '.csv'))
 #evaluate the algorithm and write the results to csv
-rslts <- evaluate_algo(algo_name, df, seed_vec = seed_vec, verbose = verbose)
+rslts <- evaluate_algo(algo_name, df, seed_vec = seed_vec)
 
 

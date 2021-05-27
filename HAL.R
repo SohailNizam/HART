@@ -47,7 +47,7 @@ for_py <- function(hal_fit, df){
 
 
 ### import data, fit hal, get cvr2, create objects for py, write all to csv ###
-write_hal_files <- function(df, df_name, seed_vec, verbose){
+write_hal_files <- function(df, df_name, seed_vec){
   
   '
   This function takes in a dataframe, the name of the dataframe as a string,
@@ -69,7 +69,8 @@ write_hal_files <- function(df, df_name, seed_vec, verbose){
   
   #initialize vector for cv r2 values
   r2_vec <- vector(length = length(seed_vec))
-  
+  #keep track of which number fit we're on
+  num <- 1
   #for each seed specified
   for(i in seed_vec){
     set.seed(i)
@@ -88,12 +89,11 @@ write_hal_files <- function(df, df_name, seed_vec, verbose){
     #create python-ready file
     fit_df <- for_py(hal_fit, df)
     #write the file to csv
-    write.csv(x = fit_df, 
-              file = paste('./', paste0(df_name, '_hal_', i),'.csv', sep=''))
+    write.csv(x = fit_df, file = paste0('./', df_name, '_hal_', num,'.csv'))
     
-    #if you want progress prints
-    if(verbose){print(paste0(i, " hal fit(s) done."))}
-    
+    #increment the fit counter
+    num <- num + 1
+
   }
   
   #write the r2 vector to csv
@@ -107,6 +107,6 @@ df <- read.csv(paste0('./',df_name,'.csv'))
 #write just the features to a separate csv file
 write.csv(x = df[,-1], file = paste('./', df_name,'_features.csv', sep=''))
 #write the csv needed to build HARTs in Python
-write_hal_files(df = df, df_name = df_name, seed_vec = seed_vec, verbose = verbose)
+write_hal_files(df = df, df_name = df_name, seed_vec = seed_vec)
 
 

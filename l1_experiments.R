@@ -6,10 +6,10 @@
 
 #load packages
 library(hal9001)
-library(data.table)
-library(nnls)
-library(glmnet)
-library(reshape2)
+library(data.table) #?
+library(nnls) #?
+library(glmnet) #?
+library(reshape2) #?
 
 #a function to create files needed for HART in python
 #for every l1 penalty term in a hal fit
@@ -61,7 +61,7 @@ for_py_l1 <- function(hal_fit, df, i){
   df_name <- deparse(substitute(df))
   
   #get the names of the output files
-  outfile = paste0('./', df_name, "_l1", i,".csv")
+  outfile = paste0('./', df_name, "_l1_", i,".csv")
 
   #write the final df to csv
   write.csv(x = fit_df, file = outfile)

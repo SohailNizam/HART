@@ -1,21 +1,22 @@
 #!/usr/bin/env python3
 # -*- coding: utf-8 -*-
-"""
-Created on Mon May 10 12:06:28 2021
 
-@author: sohailnizam
+"""
+A script that takes in csv files prepared either by HAL.R or l1_experiments.R, 
+creates an anytree object that represents a HART regression tree, and writes
+a new csv file containing information about the trees.
 """
 
+#import necessary libraries
 from anytree import AnyNode, Node, RenderTree
 from anytree.exporter import DotExporter
 from graphviz import Digraph
 import random
 import copy
 import pandas as pd
-import itertools as it
-import time
-import re
 import numpy as np
+import re #?
+
 
 
 
@@ -158,7 +159,6 @@ def create_fit(features):
         
         #add this variable to hal_fit
         hal_fit.append(val_strings)
-   
         
     
     return(hal_fit)
@@ -239,12 +239,15 @@ def create_value_dict(hal_fit, hal_dict):
     
     return(value_dict)
 
+
 def update_val_dict(hal_fit, value_dict):
     
     
     #update value_list by removing all terms that are only in there
     #because of an interaction that relies on this value
     #or a value greater than it within the same var
+    
+    
     #first copy value_dict so original is unaltered
     new_value_dict = value_dict.copy()
     #initialize a list of values to remove
@@ -422,6 +425,7 @@ def build_gt_list(hal_fit, end_val):
 def grow_tree(hal_fit, hal_dict, hal_fit2, value_dict, total_beta = 0, gt = [], k = 2):
     
     '''
+    The main function in this process.
     Recursively grow a hal tree.
     
     Input: hal_fit object (list of lists to be shrunk with each recursive call)
@@ -548,21 +552,25 @@ def grow_tree(hal_fit, hal_dict, hal_fit2, value_dict, total_beta = 0, gt = [], 
         return(node)
 
 
-##################### Run Examples ###########################
+##################### Evaluate Trees ##################### 
 
 
-def build_n_count(data_name, num_fits):
+
+def build_n_count(data_name, l1, num_fits):
     
     tn_counts = []
     utn_counts = []
+    features = pd.read_csv('./' + data_name + "_features.csv")
     
-    features = pd.read_csv(path + data_name + "_features.csv")
-    for i in range(2, num_fits + 2):
-        
-        t0 = time.time()
-        
+    if l1:
+        file_type = '_l1_'
+    else:
+        file_type = '_hal_'
+    
+    for i in range(1, num_fits + 1):
+                
         #read in data
-        data = pd.read_csv(path + data_name + '_fit_' + str(i) + '.csv')
+        data = pd.read_csv('./' + data_name + file_type + str(i) + '.csv')
         
         #create all objects needed for grow_tree
         hal_dict = create_dict(data)
@@ -571,14 +579,13 @@ def build_n_count(data_name, num_fits):
         hal_fit = clean_hal(hal_fit2, value_dict)
         hal_fit = sort_hal(hal_fit, value_dict)
         
-        print("objects built")
         
         #grow the tree
         #num cols - 1 to ignore the index column
         tree = grow_tree(hal_fit, hal_dict, hal_fit2, 
                          value_dict, k = features.shape[1] - 1)
         
-        print("tree", i, "built in", time.time() - t0, "seconds")
+       # print("tree", i, "built in", time.time() - t0, "seconds")
         
         #append terminal node counts
         tn_counts.append(len(tree.leaves))
@@ -594,7 +601,6 @@ def build_n_count(data_name, num_fits):
         #append unique terminal node counts
         utn_counts.append(utn_count)
         
-        print(i, "totally done in", time.time() - t0, "seconds")
     
     #save all counts as a pandas df
     node_count_df = pd.DataFrame({"tn_counts" : tn_counts,
@@ -605,7 +611,7 @@ def build_n_count(data_name, num_fits):
 
 
 
-path = '/Users/sohailnizam/Documents/HAL_9001/HAL_data/'
+
 
 ########## CPU ##############
 
@@ -641,60 +647,6 @@ fev_hal_sd_tn_count = np.std(fev_node_counts["tn_counts"]) #226.11
 fev_hal_mean_utn_count = np.mean(fev_node_counts["utn_counts"]) #245.38
 fev_hal_sd_utn_count = np.std(fev_node_counts["utn_counts"]) #65.36
 
-
-
-########## CPU ##############
-
-cpu_features = pd.read_csv(path + 'cpu_features.csv')
-cpu = pd.read_csv(path + 'cpu_fit.csv')
-
-#data structure prep
-hal_dict = create_dict(cpu)
-hal_fit2 = create_fit(cpu_features)
-value_dict = create_value_dict(hal_fit2, hal_dict)
-hal_fit = clean_hal(hal_fit2, value_dict)
-hal_fit = sort_hal(hal_fit, value_dict)
-
-#build tree
-cpu_tree = grow_tree(hal_fit, hal_dict, hal_fit2, value_dict, k = 6)
-#count nodes
-#node_count(cpu_tree) #887,637
-
-
-############# MUSSELS #############
-mussels_features = pd.read_csv(path + 'mussels_features.csv')
-mussels = pd.read_csv(path + 'mussels_fit.csv')
-
-#data structure prep
-hal_dict = create_dict(mussels)
-hal_fit2 = create_fit(mussels_features)
-value_dict = create_value_dict(hal_fit2, hal_dict)
-hal_fit = clean_hal(hal_fit2, value_dict)
-hal_fit = sort_hal(hal_fit, value_dict)
-
-#build tree
-mussels_tree = grow_tree(hal_fit, hal_dict, hal_fit2, value_dict, k = 4)
-#count nodes
-#node_count(mussels_tree) #10,743
-
-
-
-############### FEV ###############
-fev_features = pd.read_csv(path + 'fev_features.csv')
-fev = pd.read_csv(path + 'fev_fit.csv')
-
-#data structure prep
-hal_dict = create_dict(fev)
-hal_fit2 = create_fit(fev_features)
-value_dict = create_value_dict(hal_fit2, hal_dict)
-hal_fit = clean_hal(hal_fit2, value_dict)
-hal_fit = sort_hal(hal_fit, value_dict)
-
-#build tree
-fev_tree = grow_tree(hal_fit, hal_dict, hal_fit2, value_dict, k = 4)
-#count nodes
-len(fev_tree.leaves)
-#node_count(fev_tree) #1183
 
 
 
@@ -763,53 +715,3 @@ fev_node_counts.to_csv(path + "fev_node_counts.csv")
 
 
 
-'''
-##############################################
-### Unique Terminal Node Count Experiments ###
-##############################################
-
-
-#####Grow and Evaluate Tree####
-
-
-cpu_pred_list = []
-count = 0
-for leaf in cpu_tree.leaves:
-    pred = leaf.pred
-    for term, coeff in hal_dict.items():
-        if "," in term and coeff[1] != 0:
-            if all(item in leaf.gt for item in term.split(",")):
-                pred += coeff[1]
-    cpu_pred_list.append(pred)
-    count += 1
-    print(count, " done")
-print(len(list(set(cpu_pred_list)))) #175776
-                
-                
-mussels_pred_list = []
-count = 0
-for leaf in mussels_tree.leaves:
-    pred = leaf.pred
-    for term, coeff in hal_dict.items():
-        if "," in term and coeff[1] != 0:
-            if all(item in leaf.gt for item in term.split(",")):
-                pred += coeff[1]
-    mussels_pred_list.append(pred)
-    count += 1
-    print(count, " done")
-print(len(list(set(mussels_pred_list)))) #3611
-
-
-fev_pred_list = []
-count = 0
-for leaf in fev_tree.leaves:
-    pred = leaf.pred
-    for term, coeff in hal_dict.items():
-        if "," in term and coeff[1] != 0:
-            if all(item in leaf.gt for item in term.split(",")):
-                pred += coeff[1]
-    fev_pred_list.append(pred)
-    count += 1
-    print(count, " done")
-print(len(list(set(fev_pred_list)))) #227
-'''

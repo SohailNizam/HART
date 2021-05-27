@@ -8,13 +8,12 @@ a new csv file containing information about the trees.
 """
 
 #import necessary libraries
-from anytree import AnyNode, Node, RenderTree
+from anytree import  Node
+#from anytree import AnyNode, RenderTree
 #from anytree.exporter import DotExporter
 import random
-import copy
+#import copy
 import pandas as pd
-import numpy as np
-
 
 
 

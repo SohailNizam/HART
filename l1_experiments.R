@@ -18,7 +18,7 @@ for_py_l1 <- function(hal_fit, df, i){
   '
   This function takes a hal fit object, the dataframe it was built with,
   and an index corresponding to the desired l1 penalty. HAL automatically tries
-  100 l1 penalty terms, so i can range from 1 to 100.
+  100 l1 penalty terms, but we restrict to the first 85 model fits.
 
 
   Nothing is returned. The dataframe containing the information of the specified
@@ -71,8 +71,10 @@ for_py_l1 <- function(hal_fit, df, i){
 }
 
 #fit hal and write the files for each l1 penalty term
-write_hal_files_all_l1 <- function(df){
+write_hal_files_all_l1 <- function(df, seed){
   
+  #set the random seed
+  set.seed(seed) #seed <- 123 in paper
   
   #fit hal
   hal_fit <- fit_hal(Y = df[,1], X = df[,-1],
@@ -83,19 +85,18 @@ write_hal_files_all_l1 <- function(df){
   
   
   #write the cv-r2 values to csv
-  #TODO
+  r2_vec <- 1 - (hal_fit$hal_lasso$cvm[1:85] / var(df[,1]))
+  write.csv(x = r2_vec, file =paste0('./', df_name, '_hal_l1_r2s.csv'))
   
-  #call the for_py_l1 function 100 times 
-  for(i in 1:100){
-    for_py_l1(hal_fit, df = df, i)
+  #call the for_py_l1 function 85 times 
+  for(i in 1:85){
+    for_py_l1(hal_fit = hal_fit, df = df, i)
   }
-  
   
 }
 
-#fit hal
-set.seed(seed) #seed <- 123 in paper
-
 #call the function to get all the files written to csv
-
+write_hal_files_all_l1(df = df, seed = seed)
+#also write the feature set as a separate csv file
+write.csv(x = df[,-1], file = paste('./', df_name,'_features.csv', sep=''))
 

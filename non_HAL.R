@@ -6,11 +6,11 @@
 ##########################################
 
 #load packages
-library(hal9001)
-library(nnls)
-library(SuperLearner)
-library(randomForest)
-library(rpart)
+library(hal9001, quietly = TRUE)
+library(nnls, quietly = TRUE)
+library(SuperLearner, quietly = TRUE)
+library(randomForest, quietly = TRUE)
+library(rpart, quietly = TRUE)
 
 
 #libraries for any learners beyond randomForest and rpart must be loaded
@@ -88,9 +88,14 @@ evaluate_algo <- function(algo_name, df, seed_vec){
   
 }
 
+#get the dataset name from the command line
+df_name <- commandArgs(trailingOnly = TRUE)[1]
+#get the algo name from the command line
+algo_name <- commandArgs(trailingOnly = TRUE)[2]
+seed_vec <- 1:2
 #import the seeds, store in vector
-seed_df <- read.csv(paste0('./seeds/',df_name,'_seeds.csv'))
-seed_vec <- seed_df$seed
+#seed_df <- read.csv(paste0('./seeds/',df_name,'_seeds.csv'))
+#seed_vec <- seed_df$seed
 #import the data
 df <- read.csv(paste0('./data/', df_name, '.csv'))
 #evaluate the algorithm and write the results to csv

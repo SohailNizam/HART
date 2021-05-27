@@ -19,8 +19,11 @@ You may need to play around with the cartesian_coordinates(xlim, ylim)
 '
 
 #import libraries
-library(ggplot2)
-library(dplyr)
+library(ggplot2, quietly = TRUE)
+library(dplyr, quietly = TRUE)
+
+#get the dataset name from the command line
+df_name <- commandArgs(trailingOnly = TRUE)
 
 #create the figures
 font_size <- 9

@@ -14,6 +14,7 @@ from anytree import  Node
 import random
 #import copy
 import pandas as pd
+import sys
 
 
 
@@ -628,6 +629,11 @@ def build_n_count(data_name, l1, num_fits):
     return(node_count_df)
 
 
+
+#get command line arguments: l1, data_name, and num_fits
+l1 = int(sys.argv[1])
+data_name = sys.argv[2]
+num_fits = int(sys.argv[3])
 
 if l1:
     file_type = '_l1_'

@@ -6,7 +6,7 @@
 ##########################################
 
 #load packages
-library(hal9001)
+library(hal9001, quietly = TRUE)
 
 #a function to create files needed for HART in python
 for_py <- function(hal_fit, df){
@@ -100,9 +100,14 @@ write_hal_files <- function(df, df_name, seed_vec){
 
 } 
 
+
+#get the dataset name from the command line
+df_name <- commandArgs(trailingOnly = TRUE)
+seed_vec <- 1:2
 #import the seeds, store in vector
-seed_df <- read.csv(paste0('./seeds/',df_name,'_seeds.csv'))
-seed_vec <- seed_df$seed
+#seed_df <- read.csv(paste0('./seeds/',df_name,'_seeds.csv'))
+#seed_vec <- seed_df$seed
+
 #import the data
 df <- read.csv(paste0('./data/',df_name,'.csv'))
 #write just the features to a separate csv file

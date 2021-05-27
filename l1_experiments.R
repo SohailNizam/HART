@@ -7,7 +7,7 @@
 ###########################################
 
 #load packages
-library(hal9001)
+library(hal9001, quietly = TRUE)
 
 #a function to create files needed for HART in python
 #for every l1 penalty term in a hal fit
@@ -92,6 +92,8 @@ write_hal_files_all_l1 <- function(df, df_name, seed){
 }
 
 
+#get the dataset name from the command line
+df_name <- commandArgs(trailingOnly = TRUE)
 #import the seed
 seed_df <- read.csv(paste0('./seeds/l1_seed.csv'))
 seed <- seed_df$seeds[1]

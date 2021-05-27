@@ -98,7 +98,9 @@ write_hal_files <- function(df, df_name, seed_vec){
   return()
 } 
 
-
+#import the seeds, store in vector
+seed_df <- read.csv(paste0('./seeds/',df_name,'_seeds.csv'))
+seed_vec <- seed_df$seed
 #import the data
 df <- read.csv(paste0('./data/',df_name,'.csv'))
 #write just the features to a separate csv file

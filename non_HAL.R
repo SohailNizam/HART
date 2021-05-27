@@ -86,6 +86,9 @@ evaluate_algo <- function(algo_name, df, seed_vec){
   
 }
 
+#import the seeds, store in vector
+seed_df <- read.csv(paste0('./seeds/',df_name,'_seeds.csv'))
+seed_vec <- seed_df$seed
 #import the data
 df <- read.csv(paste0('./data/', df_name, '.csv'))
 #evaluate the algorithm and write the results to csv

@@ -91,6 +91,9 @@ write_hal_files_all_l1 <- function(df, df_name, seed){
 }
 
 
+#import the seed
+seed_df <- read.csv(paste0('./seeds/l1_seed.csv'))
+seed <- seed_df$seeds[1]
 #import the data
 df <- read.csv(paste0('./data/',df_name,'.csv'))
 #call the function to get all the files written to csv

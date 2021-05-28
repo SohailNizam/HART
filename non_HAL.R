@@ -83,7 +83,7 @@ evaluate_algo <- function(algo_name, df, seed_vec){
   
   #write the results to csv
   write.csv(x = r2, 
-            file = paste0('./data/', df_name, '_', algo_name, '_r2s.csv'))
+            file = paste0('./results/', df_name, '_', algo_name, '_r2s.csv'))
   return(r2)
   
 }

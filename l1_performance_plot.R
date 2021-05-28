@@ -45,7 +45,7 @@ l1_plot <- node_counts %>%
 #save figure
 fig_width <- 5
 fig_height <- 3
-ggsave(filename = paste0("./", df_name, '_l1_performance.png'),
+ggsave(filename = paste0("./results/", df_name, '_l1_performance.png'),
        plot = l1_plot, 
        width = fig_width, height = fig_height, 
        units = "in")

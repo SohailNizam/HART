@@ -638,7 +638,7 @@ num_fits = int(sys.argv[3])
 if l1:
     file_type = '_l1_'
 else:
-    file_type= '_hal_'
+    file_type= '_hart_'
 
 #call the build_n_count function
 node_counts = build_n_count(data_name = data_name, 
@@ -651,7 +651,7 @@ r2_data = pd.read_csv('./data/' + data_name + file_type + 'r2s.csv')
 node_counts['r2'] = r2_data['r2']
 
 #write the new complete df to csv (to the current working dir)
-node_counts.to_csv('./' + data_name + file_type + 'eval.csv',  index = False)
+node_counts.to_csv('./results/' + data_name + file_type + 'eval.csv',  index = False)
 
 
 

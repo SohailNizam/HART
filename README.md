@@ -40,7 +40,7 @@ $./eval_hart.sh 1 mussels 85
 $./l1_fig.sh mussels
 ```
 The first result will be 3 csv files named cpu_hart_eval.csv, fev_hart_eval.csv, and mussels_hart_eval.csv, each with 3 columns: R^2, Terminal Node Count, Unique Terminal Node count. The number of rows will correspond to the third argument in each command above (we restrict to models built with 85 different penalty terms).
-The second result will be 3 png files containing plots relating cv_R^2 to terminal node count for models built under the different penalty terms. Results will appear in the ./results/ directory.
+The second result will be 3 png files containing plots relating cv_R^2 to terminal node count for models built under the different penalty terms. Results will appear in the ./results/ directory. All models will be fit with random seed 123, stored in ./seeds/l1_seed.csv. Alter that file to use a new seed, or change the code in l1_experiments.R.
 
 # 3. Performance of Other Algorithms (randomForest and CART/rpart) (Table 1 from paper submission)
 

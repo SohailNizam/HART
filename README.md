@@ -15,9 +15,13 @@ Highly Adaptive Regression Trees (HART) is a method for mapping Highly Adaptive 
 
 - Instructions: To reproduce results from the Table 1 of the paper submission, run the following commands at the command line from the current directory:
 
+```
 $./eval_hart.sh 0 cpu 10
+
 $./eval_hart.sh 0 fev 100
+
 $./eval_hart.sh 0 mussels 100
+```
 
 The result will be 3 csv files, each with 3 columns: R^2, Terminal Node Count, Unique Terminal Node count. The number of rows will correspond to the third argument in each command above (equal to the number of random seeds used to fit HAL for each dataset). These files can be analyzed for mean and sd of terminal node count,  unique terminal node count, and R^2 value. 
 

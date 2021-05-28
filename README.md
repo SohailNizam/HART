@@ -1,7 +1,7 @@
 #  Highly Adaptive Regression Trees
 
 Highly Adaptive Regression Trees (HART) is a method for mapping Highly Adaptive Lasso (HAL) model fits to decision trees. The files in this repository allow for reproduction of results shown in our paper submitted to NeurIPS 2021. Code was written in R version 4.0.3 (distributed under the terms of the GNU General Public License version 3) and Python version 3.7 (distributed under the terms of the PSF license agreement). There are 3 main things to explore/reproduce in this code. Below are descriptions of these tasks and how to perform them using the code and data stored in this repository. Before beginning, download the entire repository, preserve the file structure, and set this as your working directory. Please note, the code will be very time consuming to run, espcially when analyzing the cpu dataset.
-
+         
 
 # 1. HART Size and Performance (Table 1 from paper submission)
 

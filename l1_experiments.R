@@ -22,6 +22,8 @@ for_py_l1 <- function(hal_fit, df, df_name, i){
   Nothing is returned. The dataframe containing the information of the specified
   hal fit that can be used to build a HART in python is written to csv. The file
   format is df_name_l1_i.csv
+
+  SEE ALL CAPS COMMENTS BELOW FOR INSTRUCTIONS IF RUNNING THIS SCRIPT MANUALLY
   '
   
   #set the degree for hal
@@ -84,8 +86,11 @@ write_hal_files_all_l1 <- function(df, df_name, seed){
   names(r2) <- c('r2')
   write.csv(x = r2, file =paste0('./data/', df_name, '_l1_r2s.csv'))
   
-  #call the for_py_l1 function 85 times 
-  for(i in 1:3){
+  #call the for_py_l1 function 85 times
+  ## IF YOU WISH TO CHANGE THE NUMBER OF FITS, DO SO IN THE RANGE BELOW ##
+  ## THEN YOU MUST NOTE THE NUMBER OF FITS AND PASS IT TO THE num_fits VARIABLE ##
+  ## IN HART.PY ##
+  for(i in 1:85){
     for_py_l1(hal_fit = hal_fit, df = df, df_name = df_name, i)
   }
   
@@ -94,9 +99,17 @@ write_hal_files_all_l1 <- function(df, df_name, seed){
 
 #get the dataset name from the command line
 df_name <- commandArgs(trailingOnly = TRUE)
+### IF RUNNING THIS SCRIPT MANUALLY, COMMENT LINE ABOVE AND UNCOMMENT ONE LINE BELOW ###
+#df_name <- 'cpu'
+#df_name <- 'mussels'
+#df_name <- 'fev'
+
 #import the seed
 seed_df <- read.csv(paste0('./seeds/l1_seed.csv'))
 seed <- seed_df$seeds[1]
+### IF YOU WISH TO SPECIFY YOUR OWN SEEDS, COMMENT 2 LINES ABOVE AND ASSIGN seed YOURSELF ##
+
+
 #import the data
 df <- read.csv(paste0('./data/',df_name,'.csv'))
 #call the function to get all the files written to csv

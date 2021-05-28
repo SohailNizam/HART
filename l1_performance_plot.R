@@ -24,6 +24,11 @@ library(dplyr, quietly = TRUE)
 
 #get the dataset name from the command line
 df_name <- commandArgs(trailingOnly = TRUE)
+### IF RUNNING THIS SCRIPT MANUALLY, COMMENT LINE ABOVE AND UNCOMMENT ONE LINE BELOW ###
+#df_name <- 'cpu'
+#df_name <- 'mussels'
+#df_name <- 'fev'
+
 
 #create the figures
 font_size <- 9

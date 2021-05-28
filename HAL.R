@@ -16,6 +16,8 @@ for_py <- function(hal_fit, df){
   used to build it, and it creates a dataframe containing all
   of the info needed to construct the corresponding HART in 
   python.
+
+  SEE ALL CAPS COMMENTS BELOW FOR INSTRUCTIONS IF RUNNING THIS SCRIPT MANUALLY
   '
   
   # make basis list a two column matrix
@@ -103,10 +105,19 @@ write_hal_files <- function(df, df_name, seed_vec){
 
 #get the dataset name from the command line
 df_name <- commandArgs(trailingOnly = TRUE)
-seed_vec <- 1:2
+### IF RUNNING THIS SCRIPT MANUALLY, COMMENT LINE ABOVE AND UNCOMMENT ONE LINE BELOW ###
+#df_name <- 'cpu'
+#df_name <- 'mussels'
+#df_name <- 'fev'
+
+
+
 #import the seeds, store in vector
-#seed_df <- read.csv(paste0('./seeds/',df_name,'_seeds.csv'))
-#seed_vec <- seed_df$seed
+seed_df <- read.csv(paste0('./seeds/',df_name,'_seeds.csv'))
+seed_vec <- seed_df$seed
+### IF YOU WISH TO SPECIFY YOUR OWN SEEDS, COMMENT 2 LINES ABOVE AND ASSIGN seed_vec YOURSELF ##
+### IN THAT EVENT, NOTE THE NUMBER OF SEEDS USED AND PASS THAT NUMBER IN HART.PY TO THE ##
+## num_fits VARIABLE ##
 
 #import the data
 df <- read.csv(paste0('./data/',df_name,'.csv'))
